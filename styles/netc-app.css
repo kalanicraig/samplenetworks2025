@@ -1,0 +1,2441 @@
+/* Z-Index
+
+      6000  top layer
+            ToolTip .modal, .tooltiptextabove, .tooltiptext
+      5000  NCDialog
+      3000  nc-savelert      
+      2500  nc-navbar > comment-status
+      2500  commentThread
+      2010  NCDialog .dialogWindow
+      2001  NCDialog .screen ==========
+      2000  comment-bar
+      1500  FiltersPanel
+       101  URTable tabletip
+       100  Node/EdgeTable thead
+        15  NCAutoSuggest .matchlist
+        15  NCNode .ncedge
+        10  NCNode .nccomponent
+         9  NCNode .screen ============
+         1  URTable th
+         0  NetCreate
+*/
+
+:root {
+  --clr-fg: #fff;
+  --clr-bg: #dae9f2;
+  --clr-cat-fg: #fff; /* call to action */
+  --clr-cat-bg: #c35400; /* call to action */
+  --clr-warning: #a20000;
+  --clr-cat-light: #f7f3f2;
+  --clr-secondary: #6a8899; /* navy */
+  --clr-system: #355869; /* dark navy for UI/system labels */
+  --clr-system-light: #4b7c94; /* UI/system bg usable w FFF for contrast */
+  --clr-system-disabled: #526b78; /* dark navy for UI/system labels */
+  --clr-system-faded: #35586999; /* transparent UI/system labels */
+  --clr-system-fadedmore: #35586966; /* transparent UI/system labels */
+  --clr-base-font: #161616;
+  --font-size-xs: 0.625rem; /* 10px */
+  --font-size-sm: 0.75rem; /* 12px */
+  --font-size-reduced: 0.875rem; /* 14px */
+  --font-size-normal: 1rem; /* 16px */
+  --font-size-md: 1.125rem; /* 18px */
+  --font-size-lg: 1.25rem; /* 20px */
+  --font-weight-normal: 300;
+  --font-weight-medium: 400;
+  --font-weight-bold: 600;
+  --z-top: 6000;
+  --z-popover: 5000;
+  --z-navbar: 2500;
+}
+
+html {
+  overflow: hidden;
+}
+body {
+  color: var(--clr-base-font);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    sans-serif;
+  font-weight: var(--font-weight-normal);
+}
+
+.system {
+  color: var(--clr-system);
+  font-size: var(--font-size-xs);
+}
+.help {
+  color: var(--clr-system-faded);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+/* NC Base ----------------------------------------------------------------- */
+
+/* Base App: NetCrate.jsx */
+.nc-base {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  background-color: var(--clr-bg);
+}
+.nc-base .nc-rows {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.nc-base .nc-col-left {
+  flex-basis: 33%;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  max-width: 400px;
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+.nc-base .nc-col-middle {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* flex: 1 0 60%; */
+}
+.nc-base .nc-col-right {
+  margin-top: 38px;
+  padding: 0;
+  border-left: 1px solid var(--clr-cat-bg);
+  border-right: 1px solid var(--clr-cat-bg);
+  border-bottom: 1px solid var(--clr-cat-bg);
+}
+
+.nc-savealert {
+  position: fixed;
+  top: 0px;
+  flex-grow: 1;
+  background-color: rgba(256, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  z-index: 3000;
+}
+.nc-savealert > div {
+  color: #fff;
+  width: 100%;
+  text-align: center;
+}
+
+/* NC Navbar -------------------------------------------------------------- */
+.nc-navbar {
+  top: 0;
+  height: 38px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-flow: row-reverse;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--clr-bg);
+  z-index: var(--z-navbar);
+}
+.nc-navbar-btns {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  z-index: var(--z-navbar);
+}
+/* Bootstrap override */
+.nav-item {
+  cursor: pointer;
+}
+
+/* SVG styles */
+svg#netgraph {
+  flex-basis: 100%;
+  min-width: 200px;
+  background: #fff;
+}
+svg#netgraph {
+  cursor: move;
+}
+/* D3SimpleNetGraph redo removes links group...
+svg .links line {
+  stroke: #aaa;
+} 
+... and replaces with .edge */
+svg#netgraph .edge {
+  stroke: #aaa;
+}
+svg#netgraph .edge.selected {
+  stroke: #f00;
+  stroke-width: 5px;
+}
+svg .nodes circle {
+  pointer-events: all;
+}
+svg#netgraph .node {
+  cursor: pointer;
+}
+svg#netgraph .nodes text {
+  color: #999;
+  stroke: #666;
+  stroke-width: 0px;
+}
+.noselect {
+  user-select: none;
+}
+
+/* NC Utils ---------------------------------------------------------------- */
+.tabselectors button {
+  line-height: 10px;
+}
+.tabselectors button > img {
+  opacity: 0.5;
+  width: 16px;
+  height: 16px;
+  padding-left: 0.25rem;
+  vertical-align: middle;
+}
+.tabselectors button.selected > img {
+  opacity: 1;
+}
+/* Buttons ----------------------------------------------------------------- */
+button {
+  color: var(--clr-system);
+  background: var(--clr-fg);
+  border-color: var(--clr-system);
+  border-width: 1px;
+  border-radius: 8px;
+  line-height: 1.5rem;
+  cursor: pointer;
+}
+button:disabled,
+button:disabled:hover {
+  /* from Chrome user stylesheet */
+  color: light-dark(
+    rgba(16, 16, 16, 0.3),
+    rgba(255, 255, 255, 0.3)
+  ); /* !important; */
+  background-color: rgba(239, 239, 239, 0.3); /* !important; */
+  border-color: rgba(118, 188, 118, 0.3); /* !important; */
+  cursor: not-allowed;
+}
+button:hover {
+  color: var(--clr-fg); /* !important; */
+  background-color: var(--clr-system); /* !important; */
+}
+/* Button Icons ------------------------------------------------------------ */
+button.cat:not(:hover) {
+  color: var(--clr-cat-fg);
+  background-color: var(--clr-cat-bg);
+}
+button.icon {
+  border: none;
+  background-color: transparent;
+  padding: 0.5rem;
+  line-height: 0.5rem;
+}
+button.icon:hover {
+  background-color: #35586922; /* !important; */
+}
+button.warning:not(:hover) {
+  border: none;
+  color: var(--clr-fg);
+  background-color: var(--clr-warning);
+}
+button.outline:not(:hover) {
+  border: none;
+  color: inherit;
+  background-color: transparent;
+}
+button.small {
+  font-size: 0.75em;
+}
+button svg {
+  width: 16px;
+  height: 16px;
+}
+button img,
+button svg {
+  pointer-events: none; /* prevent click events from grabbing event */
+}
+
+/* NC Tables --------------------------------------------------------------- */
+#NCNodeTable,
+#NCEdgeTable {
+  overflow: auto;
+  position: relative;
+  display: block;
+  left: 1px;
+  right: 10px;
+  background-color: #eafcff;
+  font-size: 0.75em;
+}
+
+/* NC Filters ------------------------------------------------------------- */
+#filterpanel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  box-sizing: border-box;
+  padding: 0;
+  background-color: var(--clr-cat-light);
+  overflow: hidden;
+  /* filterpanelClosed */
+  width: 0;
+  height: inherit;
+}
+#filterpanel.filterpanelOpen {
+  width: 100%;
+  height: 100%;
+}
+#filterpanel-btn {
+  padding: 2px 0 0 8px;
+  border: none;
+  border-radius: 0px;
+  box-shadow: none;
+  /* filterpanelClosed */
+  width: 95px;
+  position: absolute;
+}
+#filterpanel.filterpanelOpen #filterpanel-btn {
+  width: 100%;
+  position: inherit;
+}
+#filterpanel #filterpanel-btn:before {
+  content: '< ';
+}
+#filterpanel.filterpanelOpen #filterpanel-btn:before {
+  content: '';
+}
+#filterpanel.filterpanelOpen #filterpanel-btn:after {
+  content: ' >';
+}
+#filterpanel-btn:hover {
+  background-color: var(--clr-cat-bg); /* !important; */
+}
+
+.NCAdvancedPanel .footer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: end;
+  padding: 1rem 0 0.25rem 0;
+  font-size: var(--font-size-xs);
+  color: var(--clr-system-faded);
+}
+.NCAdvancedPanel .footer input {
+  font-size: var(--font-size-xs);
+}
+
+.NCAutoSuggest {
+  flex: 1; /* NCSearch */
+  display: flex;
+  flex-direction: column;
+}
+
+.matchlist {
+  position: absolute;
+  color: #3339;
+  background-color: #fff;
+  margin: 1px 0 0 0;
+  padding: 3px 0;
+  font-size: 12px;
+  z-index: 15;
+}
+.matchlist div {
+  padding: 0 10px;
+}
+
+/* line hover is handled via javascript
+   to support highlighting the current
+   node.  Do not use this css hover.
+.matchlist div:hover {
+  background-color: #ddd;
+  cursor: pointer;
+} 
+*/
+
+.matchlist div.highlighted {
+  background-color: #ccc;
+  cursor: pointer;
+}
+.matchlist .id {
+  color: #3334;
+}
+.helptop {
+  position: absolute;
+  bottom: 120%;
+  padding: 0 5px;
+  margin-bottom: 3px;
+  color: var(--clr-system);
+  background-color: #ff0c;
+  font-size: 12px;
+  font-weight: var(--font-weight-normal);
+}
+
+/* NC Node */
+.nodelabel > .matchlist {
+  max-width: 300px;
+  box-shadow: 4px 4px 6px 1px rgba(0, 0, 0, 0.1);
+  margin-top: -10px;
+}
+.nodelabel > .matchlist .warning {
+  line-height: 14px;
+  padding-top: 4px;
+  padding-bottom: 8px;
+}
+.nodelabel > .matchlist div:hover {
+  background-color: transparent;
+  cursor: default;
+}
+
+.dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 5000;
+}
+
+.dialog .screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0006;
+  z-index: 2001;
+}
+
+.dialog .dialogwindow {
+  position: relative;
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  background-color: white;
+  padding: 25px;
+  z-index: 2010;
+}
+
+.dialog .dialogcontent {
+  display: grid;
+  grid-template-rows: 25px auto 25px;
+  text-align: left;
+}
+
+.dialog .dialogmessage {
+  margin-bottom: 25px;
+}
+
+.dialog h1,
+.dialog .label {
+  font-size: 10px;
+}
+
+.dialog .label {
+  color: #0008;
+}
+
+.dialog .dialogpreview {
+  margin: 5px 0 20px 0;
+}
+
+.dialog img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  max-height: 250px;
+  background-color: blue;
+}
+
+.dialog .dialogcontrolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.NCGraph {
+  height: 100%;
+  position: relative;
+}
+.NCGraph .zoom-buttons {
+  position: absolute;
+  right: 0px;
+  bottom: 10px;
+  width: 50px;
+  z-index: 1001;
+}
+.NCGraph button {
+  width: 35px;
+  height: 35px;
+  margin-top: 0.25rem;
+  line-height: 0.5rem;
+  background-color: var(--clr-fg);
+  border-color: var(--clr-system-fadedmore);
+  opacity: 0.8;
+}
+.NCGraph .legend {
+  position: absolute;
+  bottom: 0px;
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0px;
+  font-size: var(--font-size-xs);
+  border-top: 1px solid var(--clr-system-fadedmore);
+  border-right: 1px solid var(--clr-system-fadedmore);
+  border-top-right-radius: 8px;
+  background-color: #fffd;
+}
+.NCGraph .legend h1 {
+  display: inline-block;
+  padding-right: 0.5rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+}
+.NCGraph .legend .legend-item {
+  display: inline-block;
+  padding-right: 0.75rem;
+}
+.NCGraph .legend .swatch {
+  display: inline-block;
+  width: 1rem;
+  height: 0.5rem;
+  border-radius: 8px;
+}
+
+#NCHelpText,
+#NCVocabulary {
+  padding: 10px 20px;
+}
+
+/* tabpanel --------------------------------------------------------------- */
+#NCTabPanel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+#NCTabPanel .tabs button {
+  font-weight: var(--font-weight-normal);
+  padding: 8px 26px 2px 26px;
+  opacity: 50%;
+  color: var(--clr-system);
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+}
+#NCTabPanel.NCAdvancedPanel .tabs button {
+  padding: 8px 8px 2px 8px;
+}
+#NCTabPanel .tabs button:hover {
+  opacity: 100%;
+}
+#NCTabPanel .tabs button.selected {
+  font-weight: var(--font-weight-bold);
+  opacity: 100%;
+  border-bottom: 4px solid var(--clr-cat-bg);
+}
+
+#NCTabPanel .tabpanels {
+  background-color: #fff6;
+  overflow-y: auto;
+}
+
+#NCTabPanel h1 {
+  font-size: var(--font-size-reduced);
+  font-weight: var(--font-weight-bold);
+  margin-block-start: 1rem;
+}
+#NCTabPanel h1:first-child {
+  margin-block-start: 0;
+}
+#NCTabPanel ul {
+  margin: 0;
+  padding: 0 0 0 20px;
+}
+#NCTabPanel li {
+  margin: 0;
+  padding: 0;
+}
+#NCTabPanel dt {
+  font-weight: var(--font-weight-bold);
+}
+#NCTabPanel dd {
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+
+.NCImportExport fieldset {
+  display: grid;
+  grid-template-columns: 70px auto;
+  gap: 0.5rem;
+  align-items: baseline;
+  border: none;
+  padding: 0.5rem 0;
+  margin-left: 0.5rem;
+}
+.NCImportExport fieldset div p:first-of-type {
+  margin: 0 0 0.25rem 0;
+}
+
+.NCImportExport .panel {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: rgba(226, 150, 68, 0.2);
+  font-size: var(--font-size-sm);
+}
+
+.NCImportExport .panel .buttonbar {
+  display: flex;
+  gap: 0.5rem;
+}
+.NCImportExport .panel .buttonbar.importbuttons {
+  padding: 0.5rem 0;
+}
+
+.NCImportExport .panel div.file-import {
+  display: grid;
+  grid-template-columns: 180px auto;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  margin-left: 0.5rem;
+}
+.NCImportExport .panel h2,
+.NCImportExport .panel div.file-import input {
+  font-size: var(--font-size-xs);
+}
+
+.NCImportExport fieldset.validationMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid #0003;
+  padding: 0.5rem;
+  margin-left: 0;
+  font-size: var(--font-size-xs);
+  background-color: #fff3;
+  cursor: text;
+}
+
+#InfoPanel {
+  background-color: var(--clr-bg);
+  display: grid;
+  grid-template-rows: 38px min-content auto min-content;
+}
+#InfoPanel .graphtitle {
+  color: var(--clr-system);
+  position: absolute;
+  right: 1rem;
+  top: 48px;
+  font-size: var(--font-size-sm);
+}
+/* tabpanel --------------------------------------------------------------- */
+#InfoPanel .tabs button {
+  font-weight: var(--font-weight-medium);
+  line-height: inherit; /* keeps selected cat visible */
+  padding: 8px 26px 6px 26px;
+  color: var(--clr-system-disabled) !important;
+  background-color: transparent !important;
+  border: none;
+  border-radius: 0;
+}
+#InfoPanel .tabs button:hover {
+  opacity: 100%;
+}
+#InfoPanel .tabs button.selected {
+  font-weight: var(--font-weight-);
+  opacity: 100%;
+  color: var(--clr-system);
+  border-bottom: 4px solid var(--clr-cat-bg);
+}
+#InfoPanel .tabs button img {
+  opacity: 50%;
+  width: 20px;
+  height: 20px;
+  padding-left: 0.5rem;
+  vertical-align: middle;
+}
+#InfoPanel .tabs button.selected img {
+  opacity: 1;
+}
+
+#InfoPanel .tabpanels {
+  overflow: hidden;
+}
+#InfoPanel .tabpanels > section {
+  display: flex;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+#InfoPanel .tabpanels > section.hidden {
+  display: none;
+}
+
+/* Filters Summary -------------------------------------------------------- */
+#filters-summary {
+  display: flex;
+  padding: 5px 10px;
+  font-size: var(--font-size-sm);
+  line-height: var(--font-size-normal);
+  color: #fff;
+  background-color: var(--clr-system-light);
+}
+#filters-summary button {
+  border: none;
+  font-size: 0.8rem;
+  line-height: 0.8rem;
+  margin-left: 0.5rem;
+  padding: 3px 0.5rem 1px 0.5rem;
+}
+
+/* dragger ---------------------------------------------------------------- */
+#dragger {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 10px;
+  background-color: var(--clr-cat-bg);
+  cursor: ns-resize;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0003;
+  z-index: 9;
+}
+
+.nccomponent {
+  background-color: #fff; /* knock out gray body bg */
+  border-radius: 15px;
+  position: relative;
+  font-size: 14px;
+  z-index: 10;
+}
+
+/* HTML Components */
+.nccomponent button {
+  background-color: #fff6;
+  border-radius: 5px;
+  border-color: #666;
+  border-width: 1px;
+  border-style: solid;
+  color: #333;
+  font-size: 0.9em;
+}
+.nccomponent button:hover,
+.nccomponent button.cancelbtn:hover {
+  background-color: #fff9;
+}
+.nccomponent button:disabled {
+  background-color: #fff3;
+  border-color: #0003;
+  color: #3333;
+  cursor: not-allowed;
+}
+.nccomponent button.secondary {
+  background-color: transparent;
+}
+.nccomponent input {
+  width: 100%;
+  box-sizing: border-box; /* needed for full width */
+  border-radius: 2px;
+  border-color: #666;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff8;
+  margin-bottom: 5px;
+  padding: 0 5px;
+}
+.nccomponent input.invalid,
+.nccomponent input.invalid:focus {
+  outline: #f00;
+  border-color: #f00;
+}
+.nccomponent textarea {
+  width: 100%;
+  box-sizing: border-box; /* needed for full width */
+  border-radius: 2px;
+  border-color: #666;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff8;
+  margin-bottom: 5px;
+  padding: 0 5px;
+  resize: none;
+  line-height: var(--font-size-lg);
+}
+.nccomponent textarea.long {
+  padding: 0 5px;
+  resize: vertical;
+}
+.nccomponent select {
+  width: 100%;
+  border-radius: 5px;
+  border-color: #666;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff8;
+  margin-bottom: 5px;
+}
+/* HTML Component Subtypes */
+.nccomponent button.cancelbtn {
+  background-color: transparent;
+  border-color: #0004;
+  color: #666;
+}
+.nccomponent button.sourcetargetbtn {
+  border-radius: 15px;
+  width: 100%;
+  margin-left: 0;
+  padding: 0 8px;
+  text-align: left;
+}
+.nccomponent button.sourcetargetbtn.selected {
+  outline: 1px solid blue;
+}
+.nccomponent button.sourcetargetbtn:disabled {
+  border: none;
+  color: #333;
+}
+.nccomponent button.swapbtn {
+  font-size: 18px;
+  line-height: 18px;
+  width: 25px;
+  margin: 7px 0 5px 0;
+  padding: 3px;
+}
+.nccomponent button.edgebutton {
+  background-color: #0003;
+  border-radius: 10px;
+  border-color: transparent;
+  width: 100%;
+  margin: 0 0 3px 0;
+  text-align: left;
+  font-weight: bold;
+  overflow: hidden;
+}
+.nccomponent button.addedgebutton {
+  margin: 5px;
+}
+
+/* Text Style */
+.nccomponent .message {
+  font-size: 12px;
+  padding-bottom: 0.5rem;
+}
+.nccomponent .nodelabel .message {
+  font-size: 10px;
+  font-style: italic;
+  font-weight: normal;
+  line-height: 12px;
+  margin-top: -4px;
+  opacity: 0.7;
+}
+.nccomponent .warning {
+  color: red;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0.5rem;
+}
+.nccomponent .warning {
+  padding-left: 2px;
+}
+.nccomponent .help {
+  font-size: 10px;
+  font-style: italic;
+  line-height: 14px;
+  opacity: 0.7;
+}
+
+/* Layout Components */
+.nccomponent.ncedge {
+  /* position: fixed;
+  left: 290px;
+  top: 130px; */
+  /* margin: 0 20px; */
+  margin: 10px 0;
+  height: 0;
+  overflow: hidden;
+  z-index: 15;
+}
+.nccomponent.ncedge.fullheight {
+  height: fit-content;
+  transition-property: height;
+  transition-duration: 4s;
+  transition-timing-function: ease-in-out;
+  transition-delay: 2s;
+  overflow: visible; /* show "click on node" help */
+}
+
+.nccomponent.ncedge,
+.nccomponent.ncedge .view,
+.nccomponent.ncedge .edit {
+  border-top-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.nccomponent .view,
+.nccomponent .edit {
+  border-radius: 15px;
+  padding: 8px;
+}
+
+.nccomponent .edit {
+  border: 2px;
+  border-style: solid;
+}
+
+.nccomponent .nodelabel {
+  padding: 3px 10px 0 0px;
+  font-weight: bold;
+  text-align: left;
+  overflow: hidden;
+}
+.nccomponent .edit .nodelabel {
+  padding-right: 0px;
+}
+
+.nccomponent .formview {
+  display: grid;
+  grid-template-columns: 70px auto;
+  align-items: center;
+  column-gap: 10px;
+  margin-bottom: 10px;
+}
+.nccomponent .edit .formview {
+  row-gap: 10px;
+}
+.nccomponent .formview label {
+  font-size: var(--font-size-xs);
+  line-height: var(--font-size-normal);
+  opacity: 0.7;
+  text-align: right;
+  margin-bottom: 0; /* override bootstrap */
+}
+.nccomponent .formview.typeview {
+  /* match .formview with column gap*/
+  grid-template-columns: 50px auto;
+}
+.nccomponent .formview.typeview label {
+  color: #666;
+  opacity: 1;
+}
+.nccomponent .formview .edgetypeRow {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 10px;
+  margin-bottom: 0;
+}
+.nccomponent .formview .edgetypeRow .typeview {
+  margin-bottom: 0;
+}
+.nccomponent .formview .viewvalue {
+  font-size: var(--font-size-sm);
+  line-height: var(--font-size-normal);
+  text-align: left;
+  opacity: 1;
+  overflow: hidden;
+  overflow-wrap: anywhere; /* prevents form extending into graph */
+}
+.nccomponent .formview .viewvalue img {
+  max-width: 225px;
+}
+.nccomponent .formview div.targetarrow {
+  margin-top: -5px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+.nccomponent .tabcontainer {
+  margin-top: 5px;
+}
+.nccomponent .tabcontainer .tabselectors {
+  display: grid;
+  grid-template-columns: 1fr; /* overriden */
+  padding-top: 3px;
+}
+.nccomponent .tabcontainer .tabselectors button {
+  border: none;
+  color: #0006;
+  background-color: transparent;
+  height: 25px;
+  font-size: 10px;
+  overflow: hidden;
+  text-wrap: nowrap;
+}
+.nccomponent .tabcontainer .tabselectors button:hover {
+  background-color: #fff2;
+}
+.nccomponent .tabcontainer .tabselectors button.selected {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  color: #666;
+  background-color: #fff8;
+}
+/* hide tab icon on small screen */
+.nccomponent .tabcontainer .tabselectors button img {
+  display: none;
+}
+@media (min-width: 1280px) {
+  .nccomponent .tabcontainer .tabselectors button img {
+    display: inline;
+  }
+}
+.nccomponent .tabcontainer .tabview {
+  padding: 10px 5px 5px 5px;
+  background-color: #fff8;
+}
+.nccomponent .provenance .category {
+  grid-column: span 2;
+  margin-top: 2em;
+  padding: 1em 0 0.5em 10px;
+  text-align: center;
+  border-top: 1px solid #0003;
+  /* text-decoration: underline; */
+}
+.nccomponent .provenance .category:nth-child(1) {
+  margin-top: 0;
+  padding-top: 0;
+  border: none;
+}
+.nccomponent .provenance label {
+  line-height: 12px;
+  margin-bottom: 0.25rem; /* override bootstrap */
+}
+.nccomponent .provenance div {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.nccomponent .titlebar {
+  display: grid;
+  grid-template-columns: 60px auto 34px;
+  align-items: center;
+  /* display: flex;
+  justify-content: space-between;
+  align-items: baseline; */
+}
+.nccomponent .titlebar .nodenumber {
+  font-size: 10px;
+  line-height: 26px; /* match CommmentBtn */
+  color: #666;
+  padding-right: 0.4em;
+}
+.nccomponent .titlebar .nodelabel label {
+  margin-bottom: 0; /* override bootstrap */
+}
+.nccomponent .controlbar {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: baseline;
+  padding: 10px 0 0 0;
+}
+
+.nccomponent .controlbar.deletenode {
+  justify-content: space-between;
+  background-color: #0003;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin-top: 10px;
+  padding: 10px;
+}
+.nccomponent .controlbar .deleteinput {
+  width: 7em;
+  margin: 0px;
+}
+.nccomponent .controlbar .deleteinput.invalid {
+  border: 5px double red;
+}
+
+.nccomponent .stylebutton {
+  border-radius: 2px;
+  font-size: 10px;
+  background-color: transparent;
+  margin-left: 0;
+}
+.nccomponent .citationbutton {
+  align-self: flex-start;
+  margin-left: 0;
+  border-color: #0002;
+  color: #666;
+  background-color: transparent;
+}
+
+.ncsearch {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-top: 1em;
+  margin-bottom: 20px;
+}
+.ncsearch button:not(:disabled) {
+  color: var(--clr-cat-fg);
+  background-color: var(--clr-cat-bg);
+  border-radius: 5px;
+  border: none;
+  height: 1.5rem;
+  align-self: flex-end;
+  text-wrap-mode: nowrap;
+}
+.ncsearch input {
+  height: 1.5rem;
+  padding: 0 5px;
+  font-size: 16px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+/* override help */
+.ncsearch .helptop {
+  font-size: 11px; /* fit help text */
+  font-style: italic;
+  position: unset;
+  padding: 0;
+  background-color: transparent;
+}
+
+#NCUserTokens {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+#NCUserTokens .form {
+  display: grid;
+  grid-template-columns: 70px auto;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+#NCUserTokens input:read-only {
+  color: var(--clr-system);
+  user-select: none;
+}
+#NCUserTokens fieldset {
+  display: grid;
+  grid-template-columns: 25px auto;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+#NCUserTokens textarea {
+  width: 100%;
+}
+
+div.picker {
+  position: relative;
+}
+
+.picker.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.picker.popover {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  border-radius: 9px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltipAnchor {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+
+.tooltipAnchor .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: gray;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: var(--z-top);
+  top: 150%;
+  left: 65%;
+  margin-left: -40px;
+}
+
+.tooltipAnchor .tooltiptext::after {
+  content: ' ';
+  position: absolute;
+  bottom: 100%; /* At the top of the tooltip */
+  left: 10%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent gray transparent;
+}
+
+.tooltipAnchor:hover .tooltiptext {
+  visibility: visible;
+}
+
+.tooltipAnchor .tooltiptextabove {
+  visibility: hidden;
+  width: 120px;
+  background-color: gray;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: var(--z-top);
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltipAnchor .tooltiptextabove::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: gray transparent transparent transparent;
+}
+
+.tooltipAnchor:hover .tooltiptextabove {
+  visibility: visible;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: var(--z-top);
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  position: absolute;
+  top: 10%;
+  left: 90%;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* (?) Badge overrides bootstrap .badge */
+.tooltipAnchor .badge {
+  color: var(--clr-fg);
+  background-color: var(--clr-system);
+  vertical-align: text-top;
+  padding: 0 0.25rem;
+  margin-right: 2pt;
+  display: inline-block;
+  border-radius: 1rem;
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+}
+
+.URButtonToggle {
+  color: var(--clr-system);
+  background-color: var(--clr-cat-fg);
+  border-color: var(--clr-system);
+}
+.URButtonToggle.selected {
+  color: var(--clr-cat-fg);
+  background-color: var(--clr-system);
+}
+
+:root {
+  --comment-bg: #ffd700;
+  --comment-bg-light: #f1e9c5ee;
+  --comment-bg-new: #d84a00;
+  --comment-bg-new-light: #d84a0088;
+  --comment-commenter-font-color: #333;
+  --comment-font-size-small: 10px;
+  --comment-font-size-medium: 12px;
+  --comment-font-weight-light: 300;
+  --comment-font-weight-medium: 400;
+  --comment-status-font-color: #d84a00;
+  --comment-system-font-color: #555;
+  --disabled-opacity: 0.5;
+  --cmtbtn-read: #696969; /* svg symbols */
+  --cmtbtn-unread-light: #ffe143; /* svg symbols */
+  --cmtbtn-unread-dark: #d44127; /* svg symbols */
+  --clr-comment: #ffe143;
+  --clr-comment-dark: #d44127;
+  --clr-comment-light: #ffe143;
+  --clr-comment-read-dark: #696969;
+  --clr-comment-read-light: #fff;
+}
+
+/* Comment Bar ------------------------------------------------------------- */
+#comment-bar {
+  display: flex;
+  align-self: flex-start;
+  margin-top: -11px;
+  font-size: 0.8rem;
+  z-index: 2000;
+}
+#comment-summary label,
+#comment-panel label {
+  display: none;
+  color: var(--comment-status-font-color);
+  margin: 3px 0 5px 0;
+  font-size: 10px;
+  font-weight: var(--comment-font-weight-medium);
+  width: 1px;
+  max-width: 1px;
+  overflow: hidden;
+  transition: all 0.1s ease-in;
+}
+#comment-summary:hover label,
+#comment-summary:focus label,
+#comment-panel.expanded .comment-summary-item label {
+  display: inline-block;
+  width: auto;
+  line-height: 0.5rem; /* center with cmtbtn */
+  max-width: 120px;
+  transition: all 0.1s ease-in;
+}
+#comment-bar .comment-item {
+  background: var(--comment-bg);
+  margin-bottom: 3px;
+  padding: 0 5px;
+}
+#comment-bar .comment-item .comment-sourcetype {
+  display: inline-block;
+  color: var(--comment-system-font-color);
+}
+#comment-bar .comment-item .comment-sourcelabel {
+  display: inline-block;
+  vertical-align: bottom;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#comment-bar .comment-item .commenter {
+  display: inline-block;
+}
+#comment-bar .comment-item .comment-text {
+  display: inline-block;
+  vertical-align: bottom;
+  max-width: 400px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--comment-commenter-font-color);
+}
+#comment-bar button.small {
+  background-color: #fff6;
+  border-radius: 5px;
+  border-color: #0006;
+  border-width: 1px;
+  border-style: solid;
+  color: #333;
+  font-size: 0.6rem;
+  line-height: 0.9rem;
+  margin-left: 0.25rem;
+  float: right;
+}
+/* Comment Status ---------------------------------------------------------- */
+#comment-status {
+}
+/* Comment Summary --------------------------------------------------------- */
+#comment-summary {
+  display: flex;
+  color: var(--comment-status-font-color);
+  background-color: var(--comment-bg-light);
+  border: none;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  height: 2.3rem;
+  line-height: 1.3rem;
+  cursor: pointer;
+  width: fit-content;
+  padding: 1px 5px;
+}
+#comment-summary:focus h3 {
+  width: auto;
+  line-height: 0.5rem; /* center with cmtbtn */
+  max-width: 120px;
+  transition: all 0.1s ease-in;
+}
+#comment-summary.expanded {
+  display: none;
+}
+#comment-summary .comment-summary-item {
+  display: flex;
+  align-items: center;
+}
+#comment-summary svg#comment-icon,
+.comments-unread svg#comment-icon {
+  width: 20px;
+  height: 20px;
+}
+.comments-unread .comment-count {
+  font-size: 10px;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}
+/* Comment Panel ----------------------------------------------------------- */
+#comment-panel {
+  background-color: var(--comment-bg-light);
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  display: none;
+  width: fit-content;
+  padding: 5px;
+  overflow: hidden;
+}
+#comment-panel.expanded {
+  display: block;
+  height: fit-content;
+  /* pop out so so sidebars don't move */
+  position: absolute;
+  top: 0;
+  margin-left: -300px;
+}
+/* Comment Alert ----------------------------------------------------------- */
+#comment-alert {
+  height: 2em;
+  padding-right: 10px;
+  line-height: 1.5rem;
+  /* overflow: hidden; skip this?  not necessary? */
+  opacity: 0.01;
+  transform: translateY(-150%);
+}
+#comment-alert.expanded {
+  display: block;
+  height: fit-content;
+}
+#comment-alert.appear {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.5s ease-in;
+}
+#comment-alert.disappear {
+  display: block;
+  opacity: 0.01;
+  transform: translateY(0);
+  transition: all 5s ease-in;
+}
+#comment-alert .comment-status-body {
+  position: absolute;
+  top: 2px;
+  right: 10px; /* float to the left of the main status */
+}
+.comment-status-body {
+  margin-left: 32px;
+  padding-bottom: 0.5rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.comment-status-body .comment-item {
+  display: inline-block;
+}
+/* Comments Unread */
+.comments-unread {
+  padding: 5px 10px;
+  position: relative; /* allow comment-icons to scroll */
+  max-height: 300px;
+  overflow-y: auto;
+}
+.comments-unread .comment-item {
+  display: block;
+}
+
+/* Comment Icon ------------------------------------------------------------ */
+svg#comment-icon {
+  min-width: inherit;
+  transform: scale(0.9);
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  stroke-width: 3;
+  fill: #ffd700;
+  stroke: #fffc;
+}
+.isOpen svg#comment-icon {
+  stroke: var(--comment-bg-new-light);
+}
+.comment-icon-inline {
+  display: inline-block;
+}
+.comment-icon-inline svg#comment-icon {
+  width: 11px;
+  height: 11px;
+  margin-top: -3px;
+  margin-right: 3px;
+  position: inherit;
+  fill: var(--comment-bg-new);
+}
+.comment-count {
+  color: var(--comment-bg-new);
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: -0.08em;
+  line-height: 30px;
+  position: relative;
+  text-align: center;
+}
+.hasNewComments svg#comment-icon {
+  fill: var(--comment-bg-new);
+}
+.hasNewComments .comment-count {
+  color: white;
+}
+.hasReadComments svg#comment-icon {
+  fill: #0003;
+}
+.hasReadComments .comment-count {
+  color: white;
+}
+.comment-intable svg#comment-icon {
+  width: 20px;
+  height: 20px;
+  fill: gray;
+  cursor: pointer;
+}
+
+/* Comment Thread ---------------------------------------------------------- */
+.commentThread {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--comment-bg);
+  padding: 5px;
+  /* floating */
+  position: fixed;
+  top: 120px;
+  bottom: 35px;
+  left: 380px;
+  width: 400px;
+  height: min-content;
+  min-height: 150px;
+  max-height: calc(80% - 35px);
+  font-size: 14px;
+  cursor: move;
+  z-index: 2500;
+  /* end floating */
+}
+.commentThread textarea.add {
+  width: 100%;
+  border-radius: 2px;
+  margin-bottom: 0;
+  padding: 0 5px;
+  resize: none;
+  border: inset #0003 1px;
+  background-color: #fff7;
+}
+/* .nccomponent .commentThread textarea::placeholder { */
+.commentThread textarea::placeholder {
+  color: #0003;
+}
+
+.commentIndented {
+  margin-left: 20px;
+}
+
+.commentThread button {
+  /* emulates nccomponent */
+  color: var(--comment-commenter-font-color);
+  background-color: #fff6;
+  border-radius: 5px;
+  border-color: #0006;
+  border-width: 1px;
+  border-style: solid;
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+.commentThread button:disabled {
+  cursor: default;
+  opacity: var(--disabled-opacity);
+}
+
+/* Comment------------------------------------------------------------------ */
+.comment {
+  display: grid;
+  grid-template-columns: 5em auto;
+  color: var(--comment-commenter-font-color);
+  background-color: #fff5;
+  margin-bottom: 5px;
+  padding: 5px;
+  cursor: default;
+}
+.comment:focus {
+  background-color: #fff8;
+  outline: 2px auto;
+}
+.comment:focus.unread {
+  border-width: 4px;
+}
+.comment.unread {
+  border: 3px solid var(--comment-bg-new);
+}
+.comment.deleted {
+  background-color: #0000000a;
+}
+.comment.deleted .commenttext {
+  color: #0003;
+  background-color: transparent;
+}
+.comment.deleted .commenter,
+.comment.deleted .date,
+.comment.deleted .help /* .help uses nccomponent */,
+.comment.deleted .commentId {
+  color: var(--comment-commenter-font-color);
+}
+.comment.deleted .label::before {
+  content: 'DELETED';
+  color: #0003;
+}
+.comment.deleted .label {
+  color: transparent;
+}
+.comment.deleted svg#comment-icon {
+  fill: transparent;
+}
+
+.comment .date,
+.comment .type {
+  color: #0006;
+  font-size: var(--comment-font-size-small);
+}
+.comment .date {
+  font-weight: var(--comment-font-weight-light);
+}
+.comment .type {
+  font-weight: var(--comment-font-weight-medium);
+}
+
+.commentThread .label,
+.comment .commenter,
+.comment label,
+.comment .label,
+.comment .help /* .help uses nccomponent */,
+.comment .commentId,
+.comment-status-body .commenter,
+.comment .commentTypeBar .commentTypeLabel {
+  color: var(--comment-commenter-font-color);
+  font-size: var(--comment-font-size-medium);
+  font-weight: var(--comment-font-weight-medium);
+  line-height: 14px;
+}
+.comment .label {
+  margin-top: 2px;
+}
+.commentThread .comment .help {
+  /* override nccomponent */
+  font-style: italic; /* emulate nccomponent */
+  font-size: var(--comment-font-size-small);
+  line-height: 14px;
+  opacity: 0.7;
+}
+
+.commentScroller {
+  overflow-y: auto;
+}
+
+.comment .commentTypeBar {
+  display: flex;
+  column-gap: 5px;
+}
+.comment .commentTypeBar .commentTypeLabel {
+  flex-grow: 1;
+}
+.comment .comment-item {
+  margin-bottom: 8px;
+}
+.comment .feedback,
+.comment .error {
+  opacity: 0.7;
+  font-size: var(--comment-font-size-small);
+  line-height: var(--comment-font-size-medium);
+  margin: -2px 0 8px 0;
+}
+.comment .feedback {
+  color: #0008; /* emulate nccomponent help */
+  font-style: italic;
+}
+.comment .error {
+  color: var(--comment-status-font-color);
+}
+.comment .commenttext {
+  color: var(--comment-commenter-font-color);
+  background-color: #fff5;
+  padding-left: 3px;
+  margin-bottom: 3px;
+}
+
+.comment .commentId {
+  color: #0004;
+}
+
+.comment .editmenu {
+  visibility: hidden;
+  border: none;
+  font-size: 0.7em;
+}
+.comment:focus .editmenu {
+  visibility: visible;
+}
+
+/* control bars */
+.commentThread .topbar {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 2px;
+}
+.commentThread .topbar .commentTitle {
+  color: var(--comment-system-font-color);
+}
+.commentThread .topbar .closeBtn {
+  /* content: 'X'; */
+  transform: scaleX(1.35);
+  margin: 0 3px;
+  padding: 0 3px;
+  color: #0006;
+  background-color: #fff2;
+  border: none;
+  cursor: pointer;
+}
+
+.commentbar {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+.editbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  padding-top: 5px;
+}
+
+.comment .commentbar button,
+.comment .editbar button {
+  color: white;
+  background-color: #f60;
+  width: fit-content;
+}
+.comment .commentbar button {
+  margin-left: 0; /* override nccomponent */
+}
+.comment .editbar button {
+  margin-left: 15px; /* emulate nccomponent */
+}
+
+.comment .commentbar button:hover,
+.comment .editbar button:hover {
+  color: white;
+  background-color: #b2000b;
+}
+.comment .commentbar button.secondary,
+.comment .editbar button.secondary {
+  color: #333;
+  background-color: transparent;
+}
+.comment .commentbar button.secondary:hover,
+.comment .editbar button.secondary:hover {
+  background-color: #0002;
+}
+.comment .commentbar button.danger,
+.comment .editbar button.danger {
+  color: #333;
+  background-color: transparent;
+}
+.comment .commentbar button.danger:hover,
+.comment .editbar button.danger:hover {
+  color: white;
+  background-color: #f00;
+}
+.comment .commentbar button {
+  /* visibility: hidden; */
+  display: none;
+}
+.comment:focus .commentbar {
+  padding-top: 5px;
+}
+.comment:focus-within .commentbar button {
+  /* visibility: visible; */
+  display: block;
+}
+
+/* emulate nccomponent */
+.comment select {
+  width: 100%;
+  border-radius: 5px;
+  border-color: #0006;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff8;
+  margin-bottom: 5px;
+}
+/* emulate nccomponent and override */
+.comment div textarea {
+  width: 100%;
+  border-radius: 2px;
+  border-color: #0006;
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff8;
+  margin: 0; /* override nccomponent */
+  padding: 0 5px;
+  resize: none;
+}
+
+.comment label {
+  display: block;
+  margin-right: 1rem;
+  margin-bottom: 0;
+}
+.comment label input {
+  display: inline;
+  width: fit-content;
+  margin-right: 0.25rem;
+}
+
+/* prompt format */
+.comment .prompt input[type='checkbox'] {
+  opacity: 1;
+}
+.comment .prompt input[type='checkbox'].readonly {
+  opacity: 0.5;
+}
+.comment .prompt button {
+  border: none;
+  margin-left: 0; /* override nccomponent */
+}
+.comment .prompt button:hover:disabled.notselected {
+  background-color: inherit;
+  border: none;
+}
+.comment .prompt button:hover {
+  background-color: #fff9;
+  opacity: 0.8;
+  border: 1px solid;
+  border-color: var(--comment-status-font-color);
+}
+.comment .prompt button:disabled {
+  cursor: default; /* override nccomponent */
+  opacity: var(--disabled-opacity);
+}
+.comment .prompt button.selected {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid;
+  border-color: var(--comment-status-font-color);
+}
+.comment .prompt button.selected:disabled {
+  opacity: 0.9;
+}
+.comment .prompt button.notselected {
+  opacity: 0.1;
+}
+.comment .prompt button.notselected:hover {
+  opacity: 0.3;
+}
+
+/* URCommentCollectionMgr ----------------------------------------------------------- */
+.URCommentCollectionMgr {
+  position: absolute;
+}
+
+/* SVG Comment Icons ------------------------------------------------------- */
+.commentbtn {
+  appearance: none; /* Removes default button styling */
+  background: none !important; /* override NetCreate.css */
+  border: none !important; /* override NetCreate.css */
+  padding: 1px 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  display: inline-block;
+  width: fit-content;
+  height: 30px;
+}
+.commentbtn:focus {
+  outline: 2px solid;
+}
+.commentbtn.disabled {
+  /* URCommentBtn & URCommentVBtn */
+  cursor: default;
+}
+.commentbtn > .comment-count {
+  position: absolute;
+  line-height: 28px;
+  width: 32px; /* match size of URComentBtnAlias */
+  height: 32px;
+  text-align: center;
+  color: var(--cmtbtn-unread-dark);
+}
+.commentbtn.hasUnreadComments .comment-count {
+  color: var(--cmtbtn-unread-dark);
+}
+.commentbtn.hasUnreadComments.isOpen .comment-count,
+.commentbtn.hasReadComments.isOpen .comment-count {
+  color: white;
+}
+.commentbtn.hasReadComments .comment-count {
+  color: var(--cmtbtn-read);
+}
+
+button.commentbtn svg {
+  /* override NetCreate.css `button svg` */
+  width: revert;
+  height: revert;
+}
+
+.svgcmt-read .svg-fill {
+  fill: var(--clr-comment-read-light);
+}
+.svgcmt-read .svg-outline {
+  fill: var(--clr-comment-read-light);
+}
+
+.svgcmt-read-outlined .svg-fill {
+  fill: var(--clr-comment-read-light);
+}
+.svgcmt-read-outlined .svg-outline {
+  fill: var(--clr-comment-read-dark);
+}
+
+.svgcmt-readSelected .svg-fill {
+  fill: var(--clr-comment-read-dark);
+}
+.svgcmt-readSelected .svg-outline {
+  fill: var(--clr-comment-read-dark);
+}
+
+.svgcmt-unread .svg-fill {
+  fill: var(--clr-comment-light);
+}
+.svgcmt-unread .svg-outline {
+  fill: var(--clr-comment-dark);
+}
+
+.svgcmt-unreadSelected .svg-fill {
+  fill: var(--clr-comment-dark);
+}
+.svgcmt-unreadSelected .svg-outline {
+  fill: var(--clr-comment-dark);
+}
+
+.urdate {
+  display: flex;
+  flex-direction: column;
+}
+.urdate input {
+  margin: 0;
+}
+.urdate input:read-only {
+  color: #666;
+  border: 1px solid #0003;
+}
+.urdate input.not-validated {
+  color: red;
+  border: 1px solid red;
+}
+.urdate .validator {
+  font-size: 10px;
+  line-height: 12px;
+  min-height: 12px;
+  opacity: 0.5;
+}
+
+.urdate > .filter {
+  display: grid;
+  grid-template-columns: 8em auto;
+  grid-column-gap: 5px;
+  align-items: center;
+}
+.urdate > .filter > input {
+  /* emulate ReactStrap form control */
+  display: inline-block;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid #ced4da;
+  border-radius: 0.2rem;
+  max-width: 12em;
+  height: 1.5em;
+  padding: 0.25rem 0.5rem;
+}
+.urdate > .filter > input:disabled {
+  /* emulate ReactStrap form control */
+  background-color: #e9ecef;
+}
+
+#urdialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--comment-commenter-font-color);
+  z-index: 11000; /* 10k is the default z-index for comment */
+}
+
+#urdialog .screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #0006;
+  z-index: 2001;
+}
+
+#urdialog .dialogwindow {
+  position: relative;
+  max-width: 90%;
+  max-height: 80%;
+  overflow: hidden;
+  background-color: white;
+  padding: 25px;
+  z-index: 11000;
+}
+
+#urdialog .dialogcontent {
+  display: grid;
+  grid-template-rows: 25px auto 25px;
+  text-align: left;
+}
+
+#urdialog .dialogmessage {
+  margin-bottom: 25px;
+}
+
+#urdialog h1,
+#urdialog .label {
+  font-size: 10px;
+}
+
+#urdialog .label {
+  color: #0008;
+}
+
+#urdialog .dialogpreview {
+  margin: 5px 0 20px 0;
+}
+
+#urdialog img {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  max-height: 250px;
+  background-color: blue;
+}
+
+#urdialog .dialogcontrolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+#popover {
+  position: absolute;
+  display: grid;
+  grid-template-rows: 30px auto;
+  width: 400px;
+  height: 90%;
+  top: 0;
+  right: 0;
+  z-index: var(--z-popover);
+  padding: 10px;
+  background-color: rgba(255, 243, 211, 0.95);
+
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+}
+
+#popover .popover-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#popover .popover-toolbar button img {
+  transform: rotate(45deg);
+}
+
+#popover .popover-content {
+  display: flex;
+  overflow-y: hidden;
+}
+
+.URTable {
+  /* override styles here */
+  --bg-thead-clr: #fdfdff;
+  --bg-selected-clr: #eef;
+  --bg-hover-clr: #ddf;
+  --tabletip-hover-clr: #ccf;
+  /* layout */
+  --padding-horizontal: 5px;
+  --row-height: 1em;
+}
+.URTable table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed; /* enforce column widths */
+}
+.URTable thead {
+  /* position: sticky; */
+  /* top: 0; */
+  /* z-index: 1; for some reason EdgeTable can't set z to 1 or thead will cover tabletip */
+}
+.URTable th {
+  padding: 0 var(--padding-horizontal);
+  border-right: 1px solid #999;
+  background-color: var(--bg-thead-clr);
+  top: 0;
+  position: -webkit-sticky;
+  position: sticky; /* needed for resizing columns */
+  z-index: 1; /* for some reason EdgeTable requires this or body cells will cover td */
+}
+.URTable th.selected {
+  background-color: var(--bg-selected-clr);
+}
+.URTable thead,
+.URTable thead > tr,
+.URTable thead > tr > th {
+  user-select: none;
+}
+.URTable th span.sortDisabled {
+  display: none;
+}
+.URTable th span.sortEnabled {
+  display: none;
+}
+.URTable th:hover {
+  background-color: var(--bg-hover-clr);
+  cursor: default;
+}
+.URTable th:hover span {
+  opacity: 0.5;
+}
+.URTable th:hover span.sortEnabled {
+  display: inline;
+  cursor: pointer;
+}
+.URTable th.selected span {
+  display: inline;
+}
+.URTable th.selected:hover span {
+  opacity: 1;
+}
+
+.URTable tr:hover {
+  background-color: var(--bg-hover-clr);
+}
+.URTable td {
+  padding: 0 var(--padding-horizontal);
+  height: var(--row-height);
+  max-height: var(--row-height);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.URTable .resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px; /* 5px; */
+  cursor: col-resize;
+  background-color: transparent;
+  user-select: none;
+}
+.URTable .resize-handle:hover {
+  background-color: #99f; /* Highlight handle on hover */
+}
+.URTable button {
+  padding: 0 2px;
+  text-align: left;
+}
+
+.URTable img {
+  max-width: 225px;
+  max-height: var(--row-height);
+}
+
+/* tooltip */
+.URTable .tabletip {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.URTable .tabletip-text {
+  visibility: visible;
+  width: max-content;
+  max-width: 400px;
+  white-space: normal;
+  text-overflow: unset;
+  background-color: black;
+  color: #fff;
+  border-radius: 4px;
+  padding: 5px;
+  position: absolute;
+  top: 0; /* position directly on top of the element */
+  /* bottom: 125%; /* Position above the element */
+  left: 0%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 101;
+}
+.URTable .tabletip p {
+  margin: 0; /* override markdown text spacing */
+}
+.URTable td:hover {
+  overflow: visible;
+  background-color: var(--tabletip-hover-clr);
+  position: relative;
+  z-index: 200;
+}
+.URTable td:hover .tabletip .tabletip-text {
+  visibility: visible;
+  opacity: 1;
+  z-index: 200;
+}
+.URTable td:hover .tabletip .tabletip-text a {
+  color: #ccf;
+}
+.URTable td:hover .tabletip .tabletip-text img {
+  max-width: 300px;
+  max-height: 300px;
+}
+.URTable td:hover .tabletip-source {
+  position: relative;
+  padding-top: var(--padding-horizontal);
+  padding-right: var(--padding-horizontal); /* gap next column */
+  padding-bottom: var(--padding-horizontal);
+  background-color: var(--tabletip-hover-clr);
+}
+.URTable td:hover .tabletip-source p {
+  background-color: var(--tabletip-hover-clr); /* override markdown p */
+}
+
+.NCFiltersPanel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  padding: 5px;
+  z-index: 1500;
+}
+.NCFiltersPanel.hidden {
+  /* Hide filters AND disable focus */
+  display: none;
+}
+
+.NCFiltersPanel .help {
+  padding-right: 0.5em;
+  margin-bottom: 0;
+}
+
+/* Tabs ------------------------------------------------------------------ */
+.NCFiltersPanel .tabselectors {
+  padding: 0 1rem;
+}
+.NCFiltersPanel .tabselectors button {
+  border: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  color: #0006;
+  background-color: var(--clr-fg);
+  height: 25px;
+  min-width: 6rem;
+  font-size: 10px;
+  overflow: hidden;
+  text-wrap: nowrap;
+}
+.NCFiltersPanel .tabselectors button:hover {
+  background-color: #fff2;
+}
+.NCFiltersPanel .tabselectors button.selected {
+  color: var(--clr-fg);
+  background-color: var(--clr-system-light);
+}
+
+.NCFiltersPanel .tabpanels {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 386px;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  overflow-y: scroll;
+  background-color: var(--clr-fg);
+}
+.NCFiltersPanel .tabpanels > .help {
+  margin: 0.5rem 0;
+}
+.NCFiltersPanel .tabpanels > section {
+  display: flex;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+.NCFiltersPanel .controlbar {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 5px;
+}
+
+/* Forms ------------------------------------------------------------------ */
+.NCFiltersPanel fieldset {
+  display: flex;
+  align-items: anchor-center;
+  margin-bottom: 0.125rem;
+  border: none;
+}
+.NCFiltersPanel fieldset label {
+  width: 8em;
+  margin-right: 0.5rem;
+  text-align: right;
+}
+.NCFiltersPanel fieldset select {
+  height: 1.25rem;
+  margin-right: 0.125rem;
+  padding: 0;
+  max-width: 12em;
+}
+.NCFiltersPanel fieldset input,
+.NCFiltersPanel .urdate > .filter > input {
+  border-style: solid;
+  padding: 0 0.25rem;
+  max-width: 12rem;
+}
+.NCFiltersPanel fieldset select,
+.NCFiltersPanel fieldset input,
+.NCFiltersPanel .urdate > .filter > input {
+  border-color: var(--clr-system-fadedmore);
+  border-radius: 4px;
+  border-width: 1px;
+}
+.NCFiltersPanel .urdate > .filter > input:disabled {
+  background-color: revert;
+}
+.NCFiltersPanel fieldset input:read-only {
+  border: none;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+.filter-group hr {
+  margin: 1rem 0 0.5rem 0;
+}
+.filter-group h1 {
+  color: var(--clr-system);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  margin: 0.5rem 0;
+}
+
+.filter-item.form-inline label {
+  font-size: 0.75em;
+  line-height: 1em;
+  width: 6em;
+  justify-content: flex-end;
+  text-align: right;
+  padding-right: 4px;
+}
+
+/* Focus Node Button -------------------------------------------------- */
+.NCFiltersPanel button.focusnode {
+  border-radius: 15px;
+  padding: 0 1rem;
+  font-size: var(--font-size-normal);
+  line-height: var(--font-size-normal);
+}
+
+*,
+::after,
+::before {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+input {
+  font-family: unset;
+}
+button {
+  /* chrome user stylesheet */
+  padding-block: 0;
+  text-wrap-mode: nowrap;
+}
+textarea {
+  font-family: unset;
+}
+fieldset {
+  /* chrome user stylesheet */
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline: 0;
+}
+svg {
+  vertical-align: middle; /* align svg with text */
+}
+
+
+/*# sourceMappingURL=netc-app.css.map*/
