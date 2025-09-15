@@ -10,6 +10,9 @@
       2001  NCDialog .screen ==========
       2000  comment-bar
       1500  FiltersPanel
+       310  URTable col-mgr Button
+       300  URTable th hover
+       200  URTable td hover
        101  URTable tabletip
        100  Node/EdgeTable thead
         15  NCAutoSuggest .matchlist
@@ -33,6 +36,7 @@
   --clr-system-disabled: #526b78; /* dark navy for UI/system labels */
   --clr-system-faded: #35586999; /* transparent UI/system labels */
   --clr-system-fadedmore: #35586966; /* transparent UI/system labels */
+  --clr-system-fadedmost: #35586933; /* transparent UI/system labels */
   --clr-base-font: #161616;
   --font-size-xs: 0.625rem; /* 10px */
   --font-size-sm: 0.75rem; /* 12px */
@@ -125,6 +129,12 @@ body {
   text-align: center;
 }
 
+.nc-bugreport-btn {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+}
+
 /* NC Navbar -------------------------------------------------------------- */
 .nc-navbar {
   top: 0;
@@ -149,7 +159,7 @@ body {
   cursor: pointer;
 }
 
-/* SVG styles */
+/* SVG styles -------------------------------------------------------------- */
 svg#netgraph {
   flex-basis: 100%;
   min-width: 200px;
@@ -268,7 +278,7 @@ button svg {
   display: block;
   left: 1px;
   right: 10px;
-  background-color: #eafcff;
+  background-color: var(--clr-fg);
   font-size: 0.75em;
 }
 
@@ -364,7 +374,6 @@ button svg {
   color: #3334;
 }
 .helptop {
-  position: absolute;
   bottom: 120%;
   padding: 0 5px;
   margin-bottom: 3px;
@@ -388,6 +397,31 @@ button svg {
 .nodelabel > .matchlist div:hover {
   background-color: transparent;
   cursor: default;
+}
+
+#popover.NCBugReport {
+  width: 300px;
+  height: max-content;
+  top: inherit;
+  bottom: 0;
+  left: 0;
+  background-color: #fcc;
+}
+#popover.NCBugReport .popover-content {
+  flex-direction: column;
+  font-size: var(--font-size-xs);
+}
+#popover.NCBugReport .key-value-pair {
+  display: grid;
+  grid-template-columns: 100px auto;
+  column-gap: 0.5rem;
+}
+#popover.NCBugReport .key-value-pair label {
+  text-align: right;
+  color: var(--clr-system);
+}
+#popover.NCBugReport .key-value-pair label::after {
+  content: ':';
 }
 
 .dialog {
@@ -508,8 +542,43 @@ button svg {
 }
 
 #NCHelpText,
-#NCVocabulary {
+#NCVocabulary,
+#NCTips {
   padding: 10px 20px;
+}
+
+#NCTips details > summary {
+  list-style-type: '▶️ ';
+}
+
+#NCTips details[open] > summary {
+  list-style-type: '🔽 ';
+}
+
+#NCTips details {
+  border-bottom: 1px solid gray;
+  border-radius: 0.2rem;
+  padding: 0.5rem;
+}
+
+#NCTips details[open] > summary {
+  margin-bottom: 0.5rem;
+}
+
+/* Style only the summary — no indent */
+#NCTips summary {
+  cursor: pointer;
+  font-weight: bold;
+  font-size-adjust: +0.75;
+}
+
+#NCTips details p,
+#NCTips details ul {
+  padding-left: 1rem;
+}
+
+#NCTips details ul {
+  padding-left: 2rem;
 }
 
 /* tabpanel --------------------------------------------------------------- */
@@ -545,16 +614,23 @@ button svg {
 }
 
 #NCTabPanel h1 {
+  font-weight: var(--font-weight-bold);
+  margin-block-start: 1rem;
+}
+
+#NCTabPanel h1:first-child {
+  margin-block-start: 0;
+}
+
+#NCTabPanel h2 {
   font-size: var(--font-size-reduced);
   font-weight: var(--font-weight-bold);
   margin-block-start: 1rem;
 }
-#NCTabPanel h1:first-child {
-  margin-block-start: 0;
-}
+
 #NCTabPanel ul {
   margin: 0;
-  padding: 0 0 0 20px;
+  padding: 0 0 0.1rem 0.1rem;
 }
 #NCTabPanel li {
   margin: 0;
@@ -845,10 +921,13 @@ button svg {
   display: flex;
   gap: 0.5rem;
   margin: 0 0.5rem;
-}
-.nccomponent .warning {
   padding-left: 2px;
 }
+.nccomponent .message.warning {
+  display: flex;
+  flex-direction: column;
+}
+
 .nccomponent .help {
   font-size: 10px;
   font-style: italic;
@@ -914,24 +993,42 @@ button svg {
 .nccomponent .edit .formview {
   row-gap: 10px;
 }
-.nccomponent .formview label {
+.nccomponent .formview > label {
   font-size: var(--font-size-xs);
-  line-height: var(--font-size-normal);
+  line-height: var(--font-size-sm);
   opacity: 0.7;
   text-align: right;
-  margin-bottom: 0; /* override bootstrap */
+  margin-bottom: 0.25rem; /* override bootstrap */
 }
+
+/* Type View */
 .nccomponent .formview.typeview {
   /* match .formview with column gap*/
-  grid-template-columns: 50px auto;
+  display: flex;
+  column-gap: 0.5rem;
 }
 .nccomponent .formview.typeview label {
+  text-align: left; /* override regular formview */
+  padding-left: 0.5rem; /* match .titlebar */
   color: #666;
   opacity: 1;
 }
+
+.nccomponent.ncedge .formview.typeview,
+.nccomponent.ncedge .formview.typeview div {
+  display: inline;
+  line-height: 1.25rem;
+}
+.nccomponent.ncedge .formview.typeview label {
+  display: inline;
+  padding-left: 0; /* override ncnode typeview */
+  padding-right: 0.25rem;
+}
+
 .nccomponent .formview .edgetypeRow {
   display: grid;
-  grid-template-columns: 18px 1fr;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
   column-gap: 10px;
   margin-bottom: 0;
 }
@@ -950,7 +1047,6 @@ button svg {
   max-width: 225px;
 }
 .nccomponent .formview div.targetarrow {
-  margin-top: -5px;
   text-align: center;
   font-size: 18px;
   font-weight: bold;
@@ -1020,17 +1116,16 @@ button svg {
 
 .nccomponent .titlebar {
   display: grid;
-  grid-template-columns: 60px auto 34px;
+  grid-template-columns: auto 34px;
   align-items: center;
-  /* display: flex;
-  justify-content: space-between;
-  align-items: baseline; */
+  padding-left: 0.5rem;
 }
 .nccomponent .titlebar .nodenumber {
   font-size: 10px;
+  font-weight: var(--font-weight-normal);
   line-height: 26px; /* match CommmentBtn */
   color: #666;
-  padding-right: 0.4em;
+  padding-left: 1rem;
 }
 .nccomponent .titlebar .nodelabel label {
   margin-bottom: 0; /* override bootstrap */
@@ -1120,6 +1215,8 @@ button svg {
 }
 #NCUserTokens input:read-only {
   color: var(--clr-system);
+  background-color: transparent;
+  border: none;
   user-select: none;
 }
 #NCUserTokens fieldset {
@@ -2112,7 +2209,7 @@ button.commentbtn svg {
   --bg-thead-clr: #fdfdff;
   --bg-selected-clr: #eef;
   --bg-hover-clr: #ddf;
-  --tabletip-hover-clr: #ccf;
+  --tabletip-hover-clr: var(--clr-bg);
   /* layout */
   --padding-horizontal: 5px;
   --row-height: 1em;
@@ -2127,17 +2224,29 @@ button.commentbtn svg {
   /* top: 0; */
   /* z-index: 1; for some reason EdgeTable can't set z to 1 or thead will cover tabletip */
 }
+.URTable th,
+.URTable td {
+  border-bottom: 1px solid var(--clr-system-fadedmost);
+}
 .URTable th {
-  padding: 0 var(--padding-horizontal);
-  border-right: 1px solid #999;
+  height: 2rem; /* keep header height consistent, max of 2 lines */
+  padding: 2px var(--padding-horizontal);
+  /* border-right: 1px solid #999; */
   background-color: var(--bg-thead-clr);
   top: 0;
   position: -webkit-sticky;
   position: sticky; /* needed for resizing columns */
-  z-index: 1; /* for some reason EdgeTable requires this or body cells will cover td */
+  text-align: left;
+  z-index: 300; /* higher than hovered td z-index (200) to stay on top */
 }
-.URTable th.selected {
-  background-color: var(--bg-selected-clr);
+.URTable th.selected,
+.URTable th.selected:hover {
+  color: var(--clr-cat-fg);
+  background-color: var(--clr-cat-bg);
+}
+.URTable th > div {
+  max-height: 2rem; /* keep header height consistent, max of 2 lines */
+  overflow: hidden;
 }
 .URTable thead,
 .URTable thead > tr,
@@ -2151,7 +2260,8 @@ button.commentbtn svg {
   display: none;
 }
 .URTable th:hover {
-  background-color: var(--bg-hover-clr);
+  color: inherit;
+  background-color: var(--clr-bg);
   cursor: default;
 }
 .URTable th:hover span {
@@ -2169,7 +2279,7 @@ button.commentbtn svg {
 }
 
 .URTable tr:hover {
-  background-color: var(--bg-hover-clr);
+  background-color: var(--clr-bg);
 }
 .URTable td {
   padding: 0 var(--padding-horizontal);
@@ -2230,13 +2340,13 @@ button.commentbtn svg {
 .URTable .tabletip p {
   margin: 0; /* override markdown text spacing */
 }
-.URTable td:hover {
+.URTable tr td:hover {
   overflow: visible;
   background-color: var(--tabletip-hover-clr);
   position: relative;
   z-index: 200;
 }
-.URTable td:hover .tabletip .tabletip-text {
+.URTable tr td:hover .tabletip .tabletip-text {
   visibility: visible;
   opacity: 1;
   z-index: 200;
@@ -2244,19 +2354,56 @@ button.commentbtn svg {
 .URTable td:hover .tabletip .tabletip-text a {
   color: #ccf;
 }
-.URTable td:hover .tabletip .tabletip-text img {
+.URTable tr td:hover .tabletip .tabletip-text img {
   max-width: 300px;
   max-height: 300px;
 }
-.URTable td:hover .tabletip-source {
+.URTable tr td:hover .tabletip-source {
   position: relative;
   padding-top: var(--padding-horizontal);
   padding-right: var(--padding-horizontal); /* gap next column */
   padding-bottom: var(--padding-horizontal);
   background-color: var(--tabletip-hover-clr);
 }
-.URTable td:hover .tabletip-source p {
+.URTable tr td:hover .tabletip-source p {
   background-color: var(--tabletip-hover-clr); /* override markdown p */
+}
+
+#popover.URTableColumnPanel {
+  position: fixed;
+  width: 200px;
+  height: inherit;
+  top: inherit;
+  right: inherit; /* Override URPopover default right alignment */
+  margin-top: 2rem; /* Show below the table head */
+  color: var(--clr-fg);
+  background-color: var(--clr-system-light);
+}
+#popover.URTableColumnPanel .popover-content {
+  flex-direction: column;
+  font-size: var(--font-size-xs);
+}
+#popover.URTableColumnPanel .key-value-pair {
+  display: grid;
+  grid-template-columns: 25px auto;
+  column-gap: 0.5rem;
+  align-items: center;
+  text-align: center;
+}
+#popover.URTableColumnPanel .key-value-pair label {
+  text-align: left;
+}
+
+/* Column Manager Button */
+#NCNodeTable .colmgr-btn,
+#NCEdgeTable .colmgr-btn {
+  position: fixed;
+  z-index: 310;
+  margin: 5px;
+}
+#NCNodeTable button.icon.colmgr-btn,
+#NCEdgeTable button.icon.colmgr-btn {
+  font-size: 1.5rem;
 }
 
 .NCFiltersPanel {
