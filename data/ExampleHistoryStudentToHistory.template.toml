@@ -1,5 +1,5 @@
-name = "Student Identity in Historical Source"
-description = "This network shows how students connect to a historical source"
+name = "Student Connections to Historical Source"
+description = "No Description"
 secretKey = "abd125"
 adminPassword = "M0ckAdm1nPwd"
 requireLogin = false
@@ -895,34 +895,46 @@ isProvenance = false
 hidden = false
 
   [[nodeDefs.type.options]]
-  color = "#bbbbbb"
+  color = "#eeeeee"
   label = ""
+  replacement = ""
+  delete = false
 
   [[nodeDefs.type.options]]
-  color = "#4477aa"
-  label = "Person"
+  color = "#d357fe"
+  label = "God"
+  replacement = ""
+  delete = false
 
   [[nodeDefs.type.options]]
-  color = "#66ccee"
-  label = "Activity"
+  color = "#00a3d7"
+  label = "Creature"
+  replacement = ""
+  delete = false
 
   [[nodeDefs.type.options]]
-  color = "#228833"
-  label = "Object"
+  color = "#a77b00"
+  label = "Human"
+  replacement = ""
+  delete = false
 
   [[nodeDefs.type.options]]
-  color = "#ccbb44"
-  label = "Group"
-
-  [[nodeDefs.type.options]]
-  color = "#ee6677"
+  color = "#96d35f"
   label = "Place"
+  replacement = ""
+  delete = false
+
+  [[nodeDefs.type.options]]
+  color = "#ffaa00"
+  label = "Thing"
+  replacement = ""
+  delete = false
 
 [nodeDefs.description]
 type = "string"
-displayLabel = "Notes"
-exportLabel = "Notes"
-help = "Describe this node"
+displayLabel = "Explanation"
+exportLabel = "Explanation"
+help = "A more detailed explanation that helps other people make sense of the node label"
 includeInGraphTooltip = true
 isProvenance = false
 hidden = false
@@ -932,7 +944,7 @@ type = "string"
 displayLabel = "OtherText"
 exportLabel = "OtherText"
 help = "General purpose notes text field"
-includeInGraphTooltip = false
+includeInGraphTooltip = true
 isProvenance = false
 hidden = true
 
@@ -941,7 +953,7 @@ type = "select"
 displayLabel = "SomeType"
 exportLabel = "SomeType"
 help = "Select a category"
-includeInGraphTooltip = false
+includeInGraphTooltip = true
 isProvenance = false
 hidden = true
 
@@ -954,7 +966,7 @@ type = "number"
 displayLabel = "SomeNumber"
 exportLabel = "SomeNumber"
 help = "Some number comparison"
-includeInGraphTooltip = false
+includeInGraphTooltip = true
 isProvenance = false
 hidden = true
 
@@ -962,16 +974,16 @@ hidden = true
 type = "string"
 displayLabel = "Citation"
 exportLabel = "Citation"
-help = 'What source did this node come from (e.g. "Part 2 06.03")'
+help = 'Source Book.Chapter (e.g. "Part 2 06.03")'
 includeInGraphTooltip = true
 isProvenance = true
 hidden = false
 
 [nodeDefs.infoOrigin]
 type = "infoOrigin"
-displayLabel = "Created By/When"
-exportLabel = "Created By/When"
-help = "Who created this? When?  (aka Source)"
+displayLabel = "Info Source"
+exportLabel = "InfoSource"
+help = "Who created this?  (aka Source)"
 includeInGraphTooltip = true
 isProvenance = true
 hidden = false
@@ -1057,18 +1069,26 @@ isProvenance = false
 hidden = false
 
   [[edgeDefs.type.options]]
-  color = "#bbbbbb"
+  color = "#eeeeee"
   label = ""
 
   [[edgeDefs.type.options]]
-  color = "#aa3377"
-  label = "Connected to"
+  color = "#919191"
+  label = "interacts with"
+
+  [[edgeDefs.type.options]]
+  color = "#929292"
+  label = "visits"
+
+  [[edgeDefs.type.options]]
+  color = "#4f7a28"
+  label = "connected"
 
 [edgeDefs.description]
 type = "string"
-displayLabel = "Notes"
+displayLabel = "Explanation"
 exportLabel = "Description"
-help = "Description of the connection"
+help = "A more detailed explanation that helps other people make sense of the node label"
 isProvenance = false
 hidden = false
 
@@ -1088,15 +1108,15 @@ hidden = true
 type = "string"
 displayLabel = "Citation"
 exportLabel = "Citation"
-help = "How do you know? What is the source?"
+help = 'Source Book.Chapter (e.g. "Part 2 06.03")'
 isProvenance = true
 hidden = false
 
 [edgeDefs.infoOrigin]
 type = "infoOrigin"
-displayLabel = "Created by/when"
+displayLabel = "Info Source"
 exportLabel = "InfoSource"
-help = "Who created this? When? (aka Source)"
+help = "Who created this? (aka Source)"
 isProvenance = true
 hidden = false
 

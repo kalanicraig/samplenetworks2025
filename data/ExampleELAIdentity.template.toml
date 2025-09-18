@@ -1,7 +1,7 @@
 name = "Student Identity in a Fictional Source"
 description = "This network lets students track the many kinds of connections that are possible in complex literary sources. "
-secretKey = "exp626"
-adminPassword = "ncpower"
+secretKey = "abd125"
+adminPassword = "M0ckAdm1nPwd"
 requireLogin = false
 hideDeleteNodeButton = false
 allowLoggedInUserToImport = false

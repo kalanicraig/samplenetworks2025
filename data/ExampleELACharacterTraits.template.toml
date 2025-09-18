@@ -1,7 +1,7 @@
 name = "Student Connections to Characters and Traits"
 description = "A network showing how students connect to different characters and their character traits."
-secretKey = "exp626"
-adminPassword = "ncpower"
+secretKey = "abd125"
+adminPassword = "M0ckAdm1nPwd"
 requireLogin = false
 hideDeleteNodeButton = false
 allowLoggedInUserToImport = false

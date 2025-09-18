@@ -1,7 +1,7 @@
 name = "Modern Connections to Historical Sources"
 description = "This network shows how historical events and time periods are connected to students' modern day experiences"
 secretKey = "aexp626"
-adminPassword = "ncpower"
+adminPassword = "M0ckAdm1nPwd"
 requireLogin = false
 hideDeleteNodeButton = false
 allowLoggedInUserToImport = false

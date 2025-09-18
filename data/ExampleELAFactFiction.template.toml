@@ -1,7 +1,7 @@
 name = "Fact and Fiction"
 description = "This network helps determining which elements of plot are factual from history and which are elements of fiction that are added for the sake of the storyline and examining characters, events, and locations for their potential historical contexts."
-secretKey = "exp626"
-adminPassword = "ncpower"
+secretKey = "abd125"
+adminPassword = "M0ckAdm1nPwd"
 requireLogin = false
 hideDeleteNodeButton = false
 allowLoggedInUserToImport = false
